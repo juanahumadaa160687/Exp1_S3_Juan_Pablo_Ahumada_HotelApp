@@ -30,10 +30,14 @@ public class HabitacionController {
 
     }
 
+    // Método para ver todas las habitaciones existentes.
+
     @GetMapping("/habitaciones")
     public List<Habitacion> getHabitaciones() {
         return habitaciones;
     }
+
+    // Método para ver una habitación específica por su ID.
 
     @GetMapping("/habitaciones/{id}")
     public Habitacion getHabitacionById(@PathVariable int id) {
@@ -44,6 +48,8 @@ public class HabitacionController {
         }
         return null;
     }
+
+   // Método para ver la disponibilidad de habitaciones. 
 
     @GetMapping("/habitaciones/disponibilidad")
     public List<Habitacion> getDisponibilidad() {

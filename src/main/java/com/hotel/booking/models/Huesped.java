@@ -10,6 +10,7 @@ import lombok.Setter;
 public class Huesped {
 
     private int id;
+    private String numero_documento;
     private String nombre;
     private String apellido;
     private String email;

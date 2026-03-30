@@ -2,10 +2,10 @@ package com.hotel.booking.controllers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.hotel.booking.models.Habitacion;
@@ -19,16 +19,16 @@ public class ReservaController {
 
     public ReservaController() {
 
-        reservas.add(new Reserva(1, 1, 1, 2, 0, "2024-07-01", "2024-07-05", false, 400.0, "Ninguna"));
-        reservas.add(new Reserva(2, 2, 2, 2, 1, "2024-07-10", "2024-07-15", false, 600.0, "Cama extra para niño"));
-        reservas.add(new Reserva(3, 3, 3, 4, 0, "2024-08-01", "2024-08-10", false, 1500.0, "Ninguna"));
-        reservas.add(new Reserva(4, 4, 4, 5, 2, "2024-08-15", "2024-08-20", true, 1200.0, "Cancelada por el cliente"));
-        reservas.add(new Reserva(5, 5, 5, 1, 0, "2024-09-01", "2024-09-05", false, 250.0, "Ninguna"));
-        reservas.add(new Reserva(6, 6, 6, 2, 1, "2024-09-10", "2024-09-15", false, 400.0, "Cama extra para niño"));
-        reservas.add(new Reserva(7, 7, 7, 4, 0, "2024-10-01", "2024-10-10", false, 1500.0, "Ninguna"));
-        reservas.add(new Reserva(8, 8, 8, 5, 2, "2024-10-15", "2024-10-20", true, 1200.0, "Cancelada por el cliente"));
-        reservas.add(new Reserva(9, 9, 9, 1, 0, "2024-11-01", "2024-11-05", false, 250.0, "Ninguna"));
-        reservas.add(new Reserva(10, 10, 10, 2, 1, "2024-11-10", "2024-11-15", false, 400.0, "Cama extra para niño"));
+        reservas.add(new Reserva(1, 1, 1, 2, 0, "2024-07-01", "2024-07-05", 400.0, "Ninguna"));
+        reservas.add(new Reserva(2, 2, 2, 2, 1, "2024-07-10", "2024-07-15", 600.0, "Cama extra para niño"));
+        reservas.add(new Reserva(3, 3, 3, 4, 0, "2024-08-01", "2024-08-10", 1500.0, "Ninguna"));
+        reservas.add(new Reserva(4, 4, 4, 5, 2, "2024-08-15", "2024-08-20", 1200.0, "Cancelada por el cliente"));
+        reservas.add(new Reserva(5, 5, 5, 1, 0, "2024-09-01", "2024-09-05", 250.0, "Ninguna"));
+        reservas.add(new Reserva(6, 6, 6, 2, 1, "2024-09-10", "2024-09-15", 400.0, "Cama extra para niño"));
+        reservas.add(new Reserva(7, 7, 7, 4, 0, "2024-10-01", "2024-10-10", 1500.0, "Ninguna"));
+        reservas.add(new Reserva(8, 8, 8, 5, 2, "2024-10-15", "2024-10-20", 1200.0, "Cancelada por el cliente"));
+        reservas.add(new Reserva(9, 9, 9, 1, 0, "2024-11-01", "2024-11-05", 250.0, "Ninguna"));
+        reservas.add(new Reserva(10, 10, 10, 2, 1, "2024-11-10", "2024-11-15", 400.0, "Cama extra para niño"));
 
     }
 
@@ -81,7 +81,7 @@ public class ReservaController {
 
     // Método para ver disponibilidad de habitaciones en una fecha específica.
 
-    @GetMapping("/reservas/fecha/{fecha}")
+    @GetMapping("/reservas/disponibilidad/{fecha}")
     public List<Habitacion> getReservasByFecha(@PathVariable String fecha) {
 
         List<Reserva> reservasEnFecha = new ArrayList<>();
@@ -117,12 +117,9 @@ public class ReservaController {
                             }
                         }
                     }
-
                 }
             }
-
         }
-
         return habitacionesDisponibles;
     }
 
@@ -173,127 +170,28 @@ public class ReservaController {
     // Método para crear una nueva reserva.
 
     @GetMapping("/reservas/nueva")
-    public String nuevaReserva() {
+    public Reserva crearReserva(@RequestParam int id_huesped, @RequestParam int id_habitacion, @RequestParam int numero_adultos, @RequestParam int numero_ninos, @RequestParam String fecha_check_in, @RequestParam String fecha_check_out, @RequestParam double precio_total, @RequestParam String solicitudes_especiales) {
 
-        // Instanciamos los controladores de habitaciones y huéspedes para acceder a sus datos.
+        int nuevoId = reservas.size() + 1;
 
         HabitacionController habController = new HabitacionController();
-        HuespedController huespedController = new HuespedController();
-
-        // Generamos un nuevo ID para el huésped y la reserva.
-
-        int id_huesp = huespedController.getHuespedes().size() + 1;
-
-        int id_reserva = reservas.size() + 1;
-
-        // Solicitamos al usuario que ingrese los datos de la reserva a través de la consola.
-
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Seleccione una habitación disponible:");
-
-        // Mostramos las habitaciones disponibles para que el usuario pueda elegir.
         
-        for (Habitacion habitacion : habController.getDisponibilidad()) {
-            System.out.println("ID: " + habitacion.getId() + ", Número: " + habitacion.getNumero_habitacion() + ", Tipo: " + habitacion.getTipo_habitacion() + ", Capacidad: " + habitacion.getCapacidad() + ", Precio por noche: " + habitacion.getPrecio_por_noche());
-        }
+        double precioHabitacion = 0;
 
-        System.out.print("Ingrese el ID de la habitación seleccionada: ");
-        int id_hab = scanner.nextInt();
-
-        System.out.println("Ingrese los datos de la reserva:");
-
-        System.out.print("Ingrese el número de adultos: ");
-        int numero_adultos = scanner.nextInt();
-        System.out.print("Ingrese el número de niños: ");
-        int numero_ninos = scanner.nextInt();
-        System.out.print("Ingrese la fecha de check-in (yyyy-MM-dd): ");
-        String fecha_check_in = scanner.next();
-        System.out.print("Ingrese la fecha de check-out (yyyy-MM-dd): ");
-        String fecha_check_out = scanner.next();
-        System.out.print("Ingrese solicitudes especiales: ");
-        scanner.nextLine();
-        String solicitudes_especiales = scanner.nextLine();
-        Boolean esta_cancelada = false;
-
-        // Actualizamos la disponibilidad de la habitación seleccionada a false, ya que se está creando una reserva para esa habitación.
-
-        for (Habitacion habitacion : habController.getDisponibilidad()) {
-            if (habitacion.getId() == id_hab) {
-                habitacion.setDisponibilidad(false);
-                break;
+        for (Habitacion habitacion : habController.getHabitaciones()) {
+            if (habitacion.getId() == id_habitacion) {
+                precioHabitacion = habitacion.getPrecio_por_noche();
             }
         }
 
-        // Solicitamos al usuario que ingrese el número de documento del huésped para asociar la reserva a un huésped existente o crear uno nuevo si no existe.
+        int diasReserva = (Integer.parseInt(fecha_check_out.split("-")[2]) - Integer.parseInt(fecha_check_in.split("-")[2]));
+        
+        double precioTotalCalculado = precioHabitacion * diasReserva;
 
-        System.out.println("Ingrese el numero de documento del huésped: ");
-        String numero_documento = scanner.nextLine();
-
-        String nombre_huesped = "";
-        String apellido_huesped = "";
-
-        for (Huesped huesped : huespedController.getHuespedes()) {
-            if (huesped.getNumero_documento().equals(numero_documento)) {
-                id_huesp = huesped.getId();
-                nombre_huesped = huesped.getNombre();
-                apellido_huesped = huesped.getApellido();
-                break;
-            }
-
-            else {
-                System.out.println("Huésped no encontrado. Se creará un nuevo huésped con el número de documento proporcionado.");
-
-                System.out.print("Ingrese el nombre del huésped: ");
-                nombre_huesped = scanner.nextLine();
-                System.out.print("Ingrese el apellido del huésped: ");
-                apellido_huesped = scanner.nextLine();
-                System.out.print("Ingrese el email del huésped: ");
-                String email_huesped = scanner.nextLine();
-                System.out.print("Ingrese el teléfono del huésped: ");
-                String telefono_huesped = scanner.nextLine();
-                System.out.print("Ingrese la dirección del huésped: ");
-                String direccion_huesped = scanner.nextLine();
-                System.out.print("Ingrese la ciudad del huésped: ");
-                String ciudad_huesped = scanner.nextLine();
-                System.out.print("Ingrese el país del huésped: ");
-                String pais_huesped = scanner.nextLine();
-
-                Huesped nuevoHuesped = new Huesped(id_huesp, numero_documento, nombre_huesped, apellido_huesped, email_huesped, telefono_huesped, direccion_huesped, ciudad_huesped, pais_huesped);
-                huespedController.getHuespedes().add(nuevoHuesped);
-            }
-        }
-
-        scanner.close();
-
-        double precio_total = habController.getHabitacionById(id_hab).getPrecio_por_noche() * (Integer.parseInt(fecha_check_out.split("-")[2]) - Integer.parseInt(fecha_check_in.split("-")[2]));
-
-        // Mostramos los detalles de la reserva creada.
-
-        System.out.println("Reserva creada correctamente. Detalles: ");
-        System.out.println("ID Reserva: " + id_reserva);
-        System.out.println("Número de documento del huésped: " + numero_documento);
-        System.out.println("Nombre Huésped: " + nombre_huesped + " " + apellido_huesped);
-
-        System.out.println("Tipo de habitación: " + habController.getHabitacionById(id_hab).getTipo_habitacion());
-        System.out.println("Descripción de la habitación: " + habController.getHabitacionById(id_hab).getDescripcion());
-        System.out.println("Precio por noche: $" + habController.getHabitacionById(id_hab).getPrecio_por_noche());
-        System.out.println("Cantidad de noches: " + (Integer.parseInt(fecha_check_out.split("-")[2]) - Integer.parseInt(fecha_check_in.split("-")[2])));
-
-        System.out.println("Número de adultos: " + numero_adultos);
-        System.out.println("Número de niños: " + numero_ninos);
-        System.out.println("Fecha de check-in: " + fecha_check_in);
-        System.out.println("Fecha de check-out: " + fecha_check_out);
-        System.out.println("Precio total: $" + precio_total);
-        System.out.println("Solicitudes especiales: " + solicitudes_especiales);
-
-        // Creamos la reserva y la agregamos a la lista de reservas.
-
-        Reserva nuevaReserva = new Reserva(id_reserva, id_huesp, id_hab, numero_adultos, numero_ninos, fecha_check_in, fecha_check_out, esta_cancelada, precio_total, solicitudes_especiales);
-
+        Reserva nuevaReserva = new Reserva(nuevoId, id_huesped, id_habitacion, numero_adultos, numero_ninos, fecha_check_in, fecha_check_out, precioTotalCalculado, solicitudes_especiales);
+        
         reservas.add(nuevaReserva);
-
-        return "Reserva creada correctamente";
-
+        
+        return nuevaReserva;
     }
 }

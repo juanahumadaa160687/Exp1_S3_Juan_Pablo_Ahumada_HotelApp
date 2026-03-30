@@ -107,14 +107,15 @@ public class ReservaController {
             if ((año > añoCheckIn || (año == añoCheckIn && mes > mesCheckIn) || (año == añoCheckIn && mes == mesCheckIn && dia >= diaCheckIn)) &&
                 (año < añoCheckOut || (año == añoCheckOut && mes < mesCheckOut) || (año == añoCheckOut && mes == mesCheckOut && dia <= diaCheckOut))) {
                 
-                    reservasEnFecha.add(reserva);
+                reservasEnFecha.add(reserva);
+
+                System.out.println(reserva.getFecha_check_in() + " - " + reserva.getId_habitacion());
 
                 for (Reserva r : reservasEnFecha) {
-                    if (r.getId_habitacion() != reserva.getId_habitacion()){
-                        for (Habitacion habitacion : new HabitacionController().getHabitaciones()) {
-                            if (habitacion.getId() == r.getId_habitacion()) {
-                                habitacionesDisponibles.add(habitacion);
-                            }
+                    HabitacionController habController = new HabitacionController();
+                    for (Habitacion habitacion : habController.getHabitaciones()) {
+                        if (habitacion.getId() != r.getId_habitacion()) {
+                            habitacionesDisponibles.add(habitacion);
                         }
                     }
                 }
@@ -170,7 +171,7 @@ public class ReservaController {
     // Método para crear una nueva reserva.
 
     @GetMapping("/reservas/nueva")
-    public Reserva crearReserva(@RequestParam int id_huesped, @RequestParam int id_habitacion, @RequestParam int numero_adultos, @RequestParam int numero_ninos, @RequestParam String fecha_check_in, @RequestParam String fecha_check_out, @RequestParam double precio_total, @RequestParam String solicitudes_especiales) {
+    public Reserva crearReserva(@RequestParam int id_huesped, @RequestParam int id_habitacion, @RequestParam int numero_adultos, @RequestParam int numero_ninos, @RequestParam String fecha_check_in, @RequestParam String fecha_check_out, @RequestParam String solicitudes_especiales) {
 
         int nuevoId = reservas.size() + 1;
 
@@ -186,12 +187,23 @@ public class ReservaController {
 
         int diasReserva = (Integer.parseInt(fecha_check_out.split("-")[2]) - Integer.parseInt(fecha_check_in.split("-")[2]));
         
-        double precioTotalCalculado = precioHabitacion * diasReserva;
+        if (diasReserva > 0) {
+            double precioTotalCalculado = precioHabitacion * diasReserva;
 
-        Reserva nuevaReserva = new Reserva(nuevoId, id_huesped, id_habitacion, numero_adultos, numero_ninos, fecha_check_in, fecha_check_out, precioTotalCalculado, solicitudes_especiales);
+            Reserva nuevaReserva = new Reserva(nuevoId, id_huesped, id_habitacion, numero_adultos, numero_ninos, fecha_check_in, fecha_check_out, precioTotalCalculado, solicitudes_especiales);
         
-        reservas.add(nuevaReserva);
+            reservas.add(nuevaReserva);
         
-        return nuevaReserva;
+            return nuevaReserva;
+        }
+        else {
+            double precioTotalCalculado = precioHabitacion * diasReserva * -1;
+
+            Reserva nuevaReserva = new Reserva(nuevoId, id_huesped, id_habitacion, numero_adultos, numero_ninos, fecha_check_in, fecha_check_out, precioTotalCalculado, solicitudes_especiales);
+        
+            reservas.add(nuevaReserva);
+        
+            return nuevaReserva;
+        }
     }
 }
